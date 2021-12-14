@@ -1,8 +1,8 @@
 #!/bin/bash 
 
 # EDIT THESE
-ADDRESS="sent1c94r396teq8w3qgn548gp46zsjm2kjqn069z97"
-KEYNAME="Sisyphus"
+ADDRESS=""
+KEYNAME=""
 
 help_screen() {
         echo "MySentinel dVPN v0.1.1 (freQniK)"
