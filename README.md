@@ -62,7 +62,7 @@ $ ./mysentinel.sh part
 **NOTE:** I've experienced the follwing issues when using the sentinelcli to disconnect. It never brings down the wireguard interface. In my case after `mysentinel.sh part` I would then run `sudo ifconfig wg_interface down`. Furthermore, my `/etc/resolv.conf` is not set to my gateway, as I run a dnsproxy there. So you may have to edit `/etc/resolv.conf` as well back to the original settings.
 
 # Tipjar
-You tip a waiter for their servie, why not tip a programmer for thier code?
+You tip a waiter for their servie, why not tip a programmer for their code?
 
 ![tipjar qr](./img/dvpn_qr_code.png)
 
