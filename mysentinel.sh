@@ -1,8 +1,8 @@
 #!/bin/bash 
 
 # EDIT THESE
-ADDRESS=""
-KEYNAME=""
+ADDRESS="sent14q4f245fj25xy57yhjah98jcvy6e3zndx76fh4"
+KEYNAME="Sisyphus"
 
 help_screen() {
         echo "MySentinel dVPN v0.1.1 (freQniK)"
@@ -22,7 +22,7 @@ list_sentinel_nodes() {
         sentinelcli query nodes \
             --home "${HOME}/.sentinelcli" \
             --node https://rpc.sentinel.co:443 \
-            --limit 300
+            --limit 700
 
 }
 
@@ -60,27 +60,29 @@ list_sentinel_subscriptions() {
         
         k=0
         j=0
+
+
         for name in ${NODENAMES[@]}; do
                 for new_node in ${NODESLIST[@]}; do
+#			echo "New/Sub Node: $new_node | ${NODES[$k]}"
                         if [[ "${new_node}" == ${NODES[$k]} ]]; then
-                                echo -ne "|   ${NODENAMES[$k]}"
+                                echo -ne "|   ${NODENAMES[$j]}"
                                 
-                                len=`echo "${NODENAMES[$k]}" | wc -c`
+                                len=`echo "${NODENAMES[$j]}" | wc -c`
                                 spacelen=`echo "25 - $len" | bc`
                                 for ((i = 0 ; i <= $spacelen ; i++)); do
                                         echo -ne " "
                                 done
-                                echo -ne "|       ${NODELOCS[$k]}"
+                                echo -ne "|       ${NODELOCS[$j]}"
                                 
-                                len=`echo "${NODELOCS[$k]}" | wc -c`
+                                len=`echo "${NODELOCS[$j]}" | wc -c`
                                 spacelen=`echo "20 - $len" | bc`
                                 for ((i = 0 ; i <= $spacelen ; i++)); do
                                         echo -ne " "
                                 done
                                 echo -ne "|"
-                                echo " ${NODES[$j]}  |"
+                                echo " ${NODES[$k]}  |"
                                 
-                                let j++
                                 break
                         else
                                 let j++
