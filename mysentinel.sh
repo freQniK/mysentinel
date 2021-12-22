@@ -1,8 +1,8 @@
 #!/bin/bash 
 
 # EDIT THESE
-ADDRESS="sent14q4f245fj25xy57yhjah98jcvy6e3zndx76fh4"
-KEYNAME="Sisyphus"
+ADDRESS=""
+KEYNAME=""
 
 help_screen() {
         echo "MySentinel dVPN v0.1.1 (freQniK)"
@@ -10,12 +10,23 @@ help_screen() {
         echo "Usage: $0 [options]"
         echo " "
         echo "Options: "
-        echo "         list,                      list all available dVPN nodes"
+        echo "         list,                         list all available dVPN nodes"
+        echo "         sub <NODE_ADDRESS> <DEPOSIT>, subscribe to a node with address and deposit amount (in udpvn, i.e., 500000udpvn"
         echo "         subs,                      list your subscriptions with extra output of Location and Node Name"
-        echo "         conn <ID> <NODE_ADDRESS>,  connect to the Node with ID and NODE_ADDRESS"
-        echo "         part,                      disconnect from Sentinel dVPN. Note: you may have to ifconfig down <wg_interface> and edit /etc/resolv.conf"
+        echo "         quota <ID>,                list the quota and data used for subscription ID (found in subs option)"
+        echo "         conn <ID> <NODE_ADDRESS>,     connect to the Node with ID and NODE_ADDRESS"
+        echo "         part,                         disconnect from Sentinel dVPN. Note: you may have to ifconfig down <wg_interface> and edit /etc/resolv.conf"
         echo " "
         exit
+}
+
+list_subscription_quota() {
+	ID=$1
+	sentinelcli query quotas \
+	    --home "${HOME}/.sentinelcli" \
+	    --node https://rpc.sentinel.co:443 \
+	    --page 1 $ID
+
 }
 
 list_sentinel_nodes() {
@@ -26,6 +37,20 @@ list_sentinel_nodes() {
 
 }
 
+
+subscribe_to_node() {
+	NODE=${1}
+	DEPOSIT=${2}
+
+	echo "NODE: $NODE, DEPOSIT: $DEPOSIT"
+	sentinelcli tx subscription subscribe-to-node \
+	    --home "${HOME}/.sentinelcli" \
+	    --keyring-backend os \
+            --gas-prices 0.1udvpn \
+	    --chain-id sentinelhub-2 \
+	    --node https://rpc.sentinel.co:443 \
+	    --from $KEYNAME $NODE $DEPOSIT
+}
 
 list_sentinel_subscriptions() {
         grep_nodes=""
@@ -116,6 +141,8 @@ connect_sentinel_node() {
 part_sentinel_node() {
         sentinelcli disconnect \
             --home "${HOME}/.sentinelcli"
+	echo "Reusting sudo permission to remove wg99 interface and shut down properly..."
+	sudo ip link delete wg99
 }
 
 while [ "$#" -gt 0 ]; do
@@ -128,6 +155,21 @@ while [ "$#" -gt 0 ]; do
                         ;;
 		subs|--subscriptions)
                         list_sentinel_subscriptions
+                        shift
+                        ;;
+                sub|--subscribe)
+                        NODE=${2}
+                        DEPOSIT=${3}
+                        subscribe_to_node $NODE $DEPOSIT
+                        shift
+                        shift
+                        shift
+                        ;;
+
+                quota|--quota)
+                        ID=${2}
+                        list_subscription_quota $ID
+                        shift
                         shift
                         ;;
                 conn|--connect)
