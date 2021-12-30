@@ -1,8 +1,8 @@
 #!/bin/bash 
 
 # EDIT THESE
-ADDRESS="sent1hfkgxzrkhxdxdwjy8d74jhc4dcw5e9zm7vfzh4"
-KEYNAME="Bernoulli Numbers (dVPN)"
+ADDRESS=""
+KEYNAME=""
 
 help_screen() {
         echo "MySentinel dVPN v0.1.1 (freQniK)"
@@ -135,7 +135,7 @@ connect_sentinel_node() {
             --node https://rpc.sentinel.co:443 \
             --gas-prices 0.1udvpn \
             --yes \
-            --from  "$KEYNAME" $ID $NODE_ADDRESS
+            --from "$KEYNAME" $ID $NODE_ADDRESS
 }
 
 part_sentinel_node() {
@@ -175,7 +175,7 @@ while [ "$#" -gt 0 ]; do
                 conn|--connect)
                         ID=${2}
                         NODE_ADDRESS=${3}
-                        connect_sentinel_node $ID $NODE_ADDRESS $KEYNAME
+                        connect_sentinel_node $ID $NODE_ADDRESS "$KEYNAME"
                         shift
                         shift
                         shift
