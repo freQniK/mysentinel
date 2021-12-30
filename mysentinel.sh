@@ -1,8 +1,8 @@
 #!/bin/bash 
 
 # EDIT THESE
-ADDRESS=""
-KEYNAME=""
+ADDRESS="sent1hfkgxzrkhxdxdwjy8d74jhc4dcw5e9zm7vfzh4"
+KEYNAME="Bernoulli Numbers (dVPN)"
 
 help_screen() {
         echo "MySentinel dVPN v0.1.1 (freQniK)"
@@ -49,7 +49,7 @@ subscribe_to_node() {
             --gas-prices 0.1udvpn \
 	    --chain-id sentinelhub-2 \
 	    --node https://rpc.sentinel.co:443 \
-	    --from $KEYNAME $NODE $DEPOSIT
+	    --from "$KEYNAME" $NODE $DEPOSIT
 }
 
 list_sentinel_subscriptions() {
@@ -135,7 +135,7 @@ connect_sentinel_node() {
             --node https://rpc.sentinel.co:443 \
             --gas-prices 0.1udvpn \
             --yes \
-            --from  $KEYNAME $ID $NODE_ADDRESS
+            --from  "$KEYNAME" $ID $NODE_ADDRESS
 }
 
 part_sentinel_node() {
