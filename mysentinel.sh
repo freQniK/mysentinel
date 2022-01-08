@@ -62,12 +62,15 @@ list_sentinel_subscriptions() {
             --address $ADDRESS`
         echo "$SUBOUTPUT"
         echo " "
+        echo "                                       Available Nodes                                                       "
         echo "-------------------------------------------------------------------------------------------------------------" 
         echo "|        Node Name           |          Location         |                   Node Address                   |"
         echo "-------------------------------------------------------------------------------------------------------------"
         
         mapfile -t NODES < <(echo "${SUBOUTPUT}" | grep -oE "(sentnode[^[:space:]]+)")
- 
+        #for n in ${NODES[@]}; do
+        #	echo "$n"
+	#done
         k=0
         for node in ${NODES[@]}; do
                 if [[ $k -eq 0 ]]; then
@@ -77,36 +80,50 @@ list_sentinel_subscriptions() {
                 fi
                 let k++
         done
-
+        #echo ""
+        #echo "$grep_nodes"
+	
         NODEOUTPUT=`list_sentinel_nodes | grep -E "(${grep_nodes})"`
+        #echo " "
+        #echo "$NODEOUTPUT"
         mapfile -t NODENAMES < <(echo "${NODEOUTPUT}" | cut -d "|" -f 2 | tr -d " ")
         mapfile -t NODELOCS < <(echo "${NODEOUTPUT}" | cut -d "|" -f 6 | tr -d " ") 
         mapfile -t NODESLIST < <(echo "${NODEOUTPUT}" | cut -d "|" -f 3 | tr -d " ") 
         
         k=0
         j=0
-
+	#echo "" 
+	
+        #for name in ${NODENAMES[@]}; do
+        #	echo "$name"
+	#done
+	#
+	#for addy in ${NODESLIST[@]}; do
+        #	echo "$addy"
+	#done
+	
 
         for name in ${NODENAMES[@]}; do
-                for new_node in ${NODESLIST[@]}; do
-#			echo "New/Sub Node: $new_node | ${NODES[$k]}"
-                        if [[ "${new_node}" == ${NODES[$k]} ]]; then
-                                echo -ne "|   ${NODENAMES[$j]}"
+                #for new_node in ${NODESLIST[@]}; do
+                for old_node in ${NODES[@]}; do
+		#	echo "New/Sub Node: $old_node | ${NODESLIST[$k]}"
+                        if [[ "${old_node}" == ${NODESLIST[$k]} ]]; then
+                                echo -ne "|   ${NODENAMES[$k]}"
                                 
-                                len=`echo "${NODENAMES[$j]}" | wc -c`
+                                len=`echo "${NODENAMES[$k]}" | wc -c`
                                 spacelen=`echo "25 - $len" | bc`
                                 for ((i = 0 ; i <= $spacelen ; i++)); do
                                         echo -ne " "
                                 done
-                                echo -ne "|       ${NODELOCS[$j]}"
+                                echo -ne "|       ${NODELOCS[$k]}"
                                 
-                                len=`echo "${NODELOCS[$j]}" | wc -c`
+                                len=`echo "${NODELOCS[$k]}" | wc -c`
                                 spacelen=`echo "20 - $len" | bc`
                                 for ((i = 0 ; i <= $spacelen ; i++)); do
                                         echo -ne " "
                                 done
                                 echo -ne "|"
-                                echo " ${NODES[$k]}  |"
+                                echo " ${NODESLIST[$k]}  |"
                                 
                                 break
                         else
@@ -153,7 +170,7 @@ while [ "$#" -gt 0 ]; do
                         list_sentinel_nodes
                         shift
                         ;;
-		subs|--subscriptions)
+	       subs|--subscriptions)
                         list_sentinel_subscriptions
                         shift
                         ;;
