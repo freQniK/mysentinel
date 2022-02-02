@@ -16,17 +16,20 @@ And the KeyName of your sentinelcli wallet.
 
 ```
 $ ./mysentinel.sh help
-MySentinel dVPN v0.1.1 (freQniK)
+MySentinel dVPN v0.2.1 (freQniK)
  
 Usage: ./mysentinel.sh [options]
  
 Options: 
-         list,                      list all available dVPN nodes
-         subs,                      list your subscriptions with extra output of Location and Node Name
-         conn <ID> <NODE_ADDRESS>,  connect to the Node with ID and NODE_ADDRESS
-         part,                      disconnect from Sentinel dVPN. Note: you may have to ifconfig down <wg_interface> and edit /etc/resolv.conf
+         list,                         list all available dVPN nodes
+         sub <NODE_ADDRESS> <DEPOSIT>, subscribe to a node with address and deposit amount (in udpvn, i.e., 500000udpvn
+         subs,                         list your subscriptions with extra output of Location and Node Name
+         quota <ID>,                   list the quota and data used for subscription ID (found in subs option)
+         conn <ID> <NODE_ADDRESS>,     connect to the Node with ID and NODE_ADDRESS
+         part,                         disconnect from Sentinel dVPN. Note: you may have to ifconfig down <wg_interface> and edit /etc/resolv.conf
+         recover,                      add a wallet from the seed phrase
  
-$ 
+
 ```
 
 Example output:
@@ -62,7 +65,7 @@ $ ./mysentinel.sh part
 **NOTE:** I've experienced the follwing issues when using the sentinelcli to disconnect. It never brings down the wireguard interface. In my case after `mysentinel.sh part` I would then run `sudo ifconfig wg_interface down`. Furthermore, my `/etc/resolv.conf` is not set to my gateway, as I run a dnsproxy there. So you may have to edit `/etc/resolv.conf` as well back to the original settings.
 
 # Tipjar
-You tip a waiter for their servie, why not tip a programmer for their code?
+You tip a waiter for their service, why not tip a programmer for their code?
 
 ![tipjar qr](./img/dvpn_qr_code.png)
 

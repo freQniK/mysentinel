@@ -5,17 +5,18 @@ ADDRESS=""
 KEYNAME=""
 
 help_screen() {
-        echo "MySentinel dVPN v0.1.1 (freQniK)"
+        echo "MySentinel dVPN v0.2.1 (freQniK)"
         echo " "
         echo "Usage: $0 [options]"
         echo " "
         echo "Options: "
         echo "         list,                         list all available dVPN nodes"
         echo "         sub <NODE_ADDRESS> <DEPOSIT>, subscribe to a node with address and deposit amount (in udpvn, i.e., 500000udpvn"
-        echo "         subs,                      list your subscriptions with extra output of Location and Node Name"
-        echo "         quota <ID>,                list the quota and data used for subscription ID (found in subs option)"
+        echo "         subs,                         list your subscriptions with extra output of Location and Node Name"
+        echo "         quota <ID>,                   list the quota and data used for subscription ID (found in subs option)"
         echo "         conn <ID> <NODE_ADDRESS>,     connect to the Node with ID and NODE_ADDRESS"
         echo "         part,                         disconnect from Sentinel dVPN. Note: you may have to ifconfig down <wg_interface> and edit /etc/resolv.conf"
+        echo "         recover,                      add a wallet from the seed phrase"
         echo " "
         exit
 }
@@ -162,6 +163,16 @@ part_sentinel_node() {
 	sudo ip link delete wg99
 }
 
+recover_key() {
+	echo -ne "Wallet Name: "
+	read wallet_name
+	sentinelcli keys add \
+	    --home "${HOME}/.sentinelcli" \
+	    --keyring-backend os \
+	    "$wallet_name" --recover
+
+}
+
 while [ "$#" -gt 0 ]; do
         key=${1}
 
@@ -201,13 +212,14 @@ while [ "$#" -gt 0 ]; do
                         part_sentinel_node
                         shift
                         ;;
-                				
-                        
+                recover|--recover)
+               		recover_key
+               		shift
+               		;;
                 help|--help)
                         help_screen
                         shift
                         ;;
-                				
                 *)
                         shift
                         ;;
