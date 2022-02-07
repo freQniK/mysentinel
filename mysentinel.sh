@@ -64,11 +64,12 @@ list_sentinel_subscriptions() {
         echo "$SUBOUTPUT"
         echo " "
         echo "                                       Available Nodes                                                       "
-        echo "-------------------------------------------------------------------------------------------------------------" 
-        echo "|        Node Name           |          Location         |                   Node Address                   |"
-        echo "-------------------------------------------------------------------------------------------------------------"
+        echo "--------------------------------------------------------------------------------------------------------------------" 
+        echo "   ID  |        Node Name           |          Location         |                   Node Address                   |"
+        echo "--------------------------------------------------------------------------------------------------------------------"
         
         mapfile -t NODES < <(echo "${SUBOUTPUT}" | grep -oE "(sentnode[^[:space:]]+)")
+        mapfile -t NODEIDS < <(echo "${SUBOUTPUT}" | tail +4 | head -n -1 | cut -d "|" -f 2 | tr -d " ")
         #for n in ${NODES[@]}; do
         #	echo "$n"
 	#done
@@ -109,6 +110,7 @@ list_sentinel_subscriptions() {
                 for old_node in ${NODES[@]}; do
 		#	echo "New/Sub Node: $old_node | ${NODESLIST[$k]}"
                         if [[ "${old_node}" == ${NODESLIST[$k]} ]]; then
+                                echo -ne "| ${NODEIDS[$j]} "  
                                 echo -ne "|   ${NODENAMES[$k]}"
                                 
                                 len=`echo "${NODENAMES[$k]}" | wc -c`
@@ -137,7 +139,7 @@ list_sentinel_subscriptions() {
                 j=0
                 let k++
         done
-        echo "-------------------------------------------------------------------------------------------------------------"
+        echo "--------------------------------------------------------------------------------------------------------------------"
         
       
 }
