@@ -4,8 +4,9 @@
 ADDRESS=""
 KEYNAME=""
 
+
 help_screen() {
-        echo "MySentinel dVPN v0.2.1 (freQniK)"
+        echo "MySentinel dVPN v0.3.2 (freQniK)"
         echo " "
         echo "Usage: $0 [options]"
         echo " "
@@ -34,7 +35,7 @@ list_sentinel_nodes() {
         sentinelcli query nodes \
             --home "${HOME}/.sentinelcli" \
             --node https://rpc.sentinel.co:443 \
-            --limit 700
+            --limit 1000
 
 }
 
@@ -59,7 +60,7 @@ list_sentinel_subscriptions() {
             --home "${HOME}/.sentinelcli" \
             --node https://rpc.sentinel.co:443 \
             --status Active \
-            --page 1 \
+            --limit 100 \
             --address $ADDRESS`
         echo "$SUBOUTPUT"
         echo " "
@@ -70,9 +71,11 @@ list_sentinel_subscriptions() {
         
         mapfile -t NODES < <(echo "${SUBOUTPUT}" | grep -oE "(sentnode[^[:space:]]+)")
         mapfile -t NODEIDS < <(echo "${SUBOUTPUT}" | tail +4 | head -n -1 | cut -d "|" -f 2 | tr -d " ")
-        #for n in ${NODES[@]}; do
-        #	echo "$n"
-	#done
+#        echo "THESE ARE SUB NODES"
+#	echo " "
+#	for n in ${NODES[@]}; do
+#        	echo "$n"
+#	done
         k=0
         for node in ${NODES[@]}; do
                 if [[ $k -eq 0 ]]; then
@@ -82,51 +85,51 @@ list_sentinel_subscriptions() {
                 fi
                 let k++
         done
-        #echo ""
-        #echo "$grep_nodes"
+#        echo ""
+#        echo "$grep_nodes"
 	
         NODEOUTPUT=`list_sentinel_nodes | grep -E "(${grep_nodes})"`
-        #echo " "
-        #echo "$NODEOUTPUT"
+#        echo " "
+#        echo "$NODEOUTPUT"
         mapfile -t NODENAMES < <(echo "${NODEOUTPUT}" | cut -d "|" -f 2 | tr -d " ")
         mapfile -t NODELOCS < <(echo "${NODEOUTPUT}" | cut -d "|" -f 6 | tr -d " ") 
         mapfile -t NODESLIST < <(echo "${NODEOUTPUT}" | cut -d "|" -f 3 | tr -d " ") 
         
         k=0
         j=0
-	#echo "" 
+#	echo "" 
 	
-        #for name in ${NODENAMES[@]}; do
-        #	echo "$name"
-	#done
+#        for name in ${NODENAMES[@]}; do
+#        	echo "$name"
+#	done
 	#
-	#for addy in ${NODESLIST[@]}; do
-        #	echo "$addy"
-	#done
+#	for addy in ${NODESLIST[@]}; do
+#        	echo "$addy"
+#	done
 	
 
-        for name in ${NODENAMES[@]}; do
+        for node in ${NODES[@]}; do
                 #for new_node in ${NODESLIST[@]}; do
-                for old_node in ${NODES[@]}; do
-		#	echo "New/Sub Node: $old_node | ${NODESLIST[$k]}"
-                        if [[ "${old_node}" == ${NODESLIST[$k]} ]]; then
-                                echo -ne "| ${NODEIDS[$j]} "  
-                                echo -ne "|   ${NODENAMES[$k]}"
+                for avail_node in ${NODESLIST[@]}; do
+#			echo "New/Sub Node: $node | ${avail_node}"
+                        if [[ "${node}" == "${avail_node}" ]]; then
+                                echo -ne "| ${NODEIDS[$k]} "  
+                                echo -ne "|   ${NODENAMES[$j]}"
                                 
-                                len=`echo "${NODENAMES[$k]}" | wc -c`
+                                len=`echo "${NODENAMES[$j]}" | wc -c`
                                 spacelen=`echo "25 - $len" | bc`
                                 for ((i = 0 ; i <= $spacelen ; i++)); do
                                         echo -ne " "
                                 done
-                                echo -ne "|       ${NODELOCS[$k]}"
+                                echo -ne "|       ${NODELOCS[$j]}"
                                 
-                                len=`echo "${NODELOCS[$k]}" | wc -c`
+                                len=`echo "${NODELOCS[$j]}" | wc -c`
                                 spacelen=`echo "20 - $len" | bc`
                                 for ((i = 0 ; i <= $spacelen ; i++)); do
                                         echo -ne " "
                                 done
                                 echo -ne "|"
-                                echo " ${NODESLIST[$k]}  |"
+                                echo " ${avail_node}  |"
                                 
                                 break
                         else
