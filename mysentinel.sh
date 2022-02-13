@@ -5,20 +5,26 @@ ADDRESS=""
 KEYNAME=""
 
 
+# DO NOT TOUCH 
+SCRT="31FEE1A2A9F9C01113F90BD0BBCCE8FD6BBB8585FAF109A2101827DD1D5B95B8"
+IBCSPACES="                                                               "
+
 help_screen() {
-        echo "MySentinel dVPN v0.3.2 (freQniK)"
-        echo " "
-        echo "Usage: $0 [options]"
-        echo " "
-        echo "Options: "
-        echo "         list,                         list all available dVPN nodes"
-        echo "         sub <NODE_ADDRESS> <DEPOSIT>, subscribe to a node with address and deposit amount (in udpvn, i.e., 500000udpvn"
-        echo "         subs,                         list your subscriptions with extra output of Location and Node Name"
-        echo "         quota <ID>,                   list the quota and data used for subscription ID (found in subs option)"
-        echo "         conn <ID> <NODE_ADDRESS>,     connect to the Node with ID and NODE_ADDRESS"
-        echo "         part,                         disconnect from Sentinel dVPN. Note: you may have to ifconfig down <wg_interface> and edit /etc/resolv.conf"
-        echo "         recover,                      add a wallet from the seed phrase"
-        echo " "
+ 	__usage="
+         MySentinel dVPN v0.3.3 (freQniK)
+        
+         Usage: $0 [options]
+          
+         Options: 
+                  list,                         list all available dVPN nodes
+                  sub <NODE_ADDRESS> <DEPOSIT>, subscribe to a node with address and deposit amount (in udpvn or uscrt, i.e., 500000udpvn, 7000uscrt)
+                  subs,                         list your subscriptions with extra output of Location and Node Name
+                  quota <ID>,                   list the quota and data used for subscription ID (found in subs option)
+                  conn <ID> <NODE_ADDRESS>,     connect to the Node with ID and NODE_ADDRESS
+                  part,                         disconnect from Sentinel dVPN. Note: you may have to ifconfig down <wg_interface> and edit /etc/resolv.conf
+                  recover,                      add a wallet from the seed phrase
+          "
+        echo "$__usage"
         exit
 }
 
@@ -32,26 +38,42 @@ list_subscription_quota() {
 }
 
 list_sentinel_nodes() {
-        sentinelcli query nodes \
+        NODEOUTPUT=`sentinelcli query nodes \
             --home "${HOME}/.sentinelcli" \
             --node https://rpc.sentinel.co:443 \
-            --limit 1000
-
+            --limit 1000`
+        echo "$NODEOUTPUT" | sed -e 's/ibc\/'"$SCRT"'/uscrt'"$IBCSPACES"'/g'
 }
 
 
 subscribe_to_node() {
 	NODE=${1}
-	DEPOSIT=${2}
-
+	DEPOSIT=${2^^}
+	
+	deposit=`echo ${DEPOSIT} | grep "SCRT"`
+	is_scrt=$?
+	
+	if [[ $is_scrt -eq 0 ]]; then
+		scrt_amt=`echo ${deposit} | sed 's/[^0-9]*//g'`
+		DEPOSIT=$scrt_amt"ibc/"$SCRT
+		echo "Total SCRT: ${DEPOSIT}"
+	
+	fi
+	
 	echo "NODE: $NODE, DEPOSIT: $DEPOSIT"
-	sentinelcli tx subscription subscribe-to-node \
-	    --home "${HOME}/.sentinelcli" \
-	    --keyring-backend os \
-            --gas-prices 0.1udvpn \
-	    --chain-id sentinelhub-2 \
-	    --node https://rpc.sentinel.co:443 \
-	    --from "$KEYNAME" $NODE $DEPOSIT
+	echo -ne "Confrim (y/n): "
+	read confirmation
+	if [[ "${confirmation^^}" == "Y" ]]; then	
+		sentinelcli tx subscription subscribe-to-node \
+		    --home "${HOME}/.sentinelcli" \
+		    --keyring-backend os \
+		    --gas-prices 0.1udvpn \
+		    --chain-id sentinelhub-2 \
+		    --node https://rpc.sentinel.co:443 \
+		    --from "$KEYNAME" $NODE $DEPOSIT
+    	else
+    		echo "Aww shucks. Alright then."
+	fi
 }
 
 list_sentinel_subscriptions() {
@@ -62,12 +84,13 @@ list_sentinel_subscriptions() {
             --status Active \
             --limit 100 \
             --address $ADDRESS`
-        echo "$SUBOUTPUT"
+        echo "$SUBOUTPUT" | sed -e 's/'"$SCRT"'/uscrt'"$IBCSPACES"'/g'
+        
         echo " "
-        echo "                                       Available Nodes                                                       "
-        echo "--------------------------------------------------------------------------------------------------------------------" 
-        echo "   ID  |        Node Name           |          Location         |                   Node Address                   |"
-        echo "--------------------------------------------------------------------------------------------------------------------"
+        echo "                                                      Available Nodes                                                       "
+        echo "+--------------------------------------------------------------------------------------------------------------------------------------------------------------+" 
+        echo "|  ID  |        Node Name           |          Location         |                   Node Address                   |      Allocated       |       Consumed     |"
+        echo "+--------------------------------------------------------------------------------------------------------------------------------------------------------------+"
         
         mapfile -t NODES < <(echo "${SUBOUTPUT}" | grep -oE "(sentnode[^[:space:]]+)")
         mapfile -t NODEIDS < <(echo "${SUBOUTPUT}" | tail +4 | head -n -1 | cut -d "|" -f 2 | tr -d " ")
@@ -113,6 +136,10 @@ list_sentinel_subscriptions() {
                 for avail_node in ${NODESLIST[@]}; do
 #			echo "New/Sub Node: $node | ${avail_node}"
                         if [[ "${node}" == "${avail_node}" ]]; then
+                        	      SUBQUOTA=`list_subscription_quota ${NODEIDS[$k]}`
+                        	      allocated=`echo "$SUBQUOTA" | tail -2 | head -1 | cut -d "|" -f 3 | tr -d " "`
+                        	      consumed=`echo "$SUBQUOTA" | tail -2 | head -1 | cut -d "|" -f 4 | tr -d " "`
+                        	      
                                 echo -ne "| ${NODEIDS[$k]} "  
                                 echo -ne "|   ${NODENAMES[$j]}"
                                 
@@ -129,7 +156,22 @@ list_sentinel_subscriptions() {
                                         echo -ne " "
                                 done
                                 echo -ne "|"
-                                echo " ${avail_node}  |"
+                                echo -ne " ${avail_node}  |"
+                                
+                                len=`echo "${allocated}" | wc -c`
+                                spacelen=`echo "16 - $len" | bc`
+                                for ((i = 0 ; i <= $spacelen ; i++)); do
+                                        echo -ne " "
+                                done
+                                echo -ne "${allocated}"
+                        	      echo -ne "      |"   
+                        	         
+                        	      len=`echo "${consumed}" | wc -c`
+                                spacelen=`echo "16 - $len" | bc`
+                                for ((i = 0 ; i <= $spacelen ; i++)); do
+                                        echo -ne " "
+                                done
+                                echo  "${consumed}    |"
                                 
                                 break
                         else
@@ -142,7 +184,7 @@ list_sentinel_subscriptions() {
                 j=0
                 let k++
         done
-        echo "--------------------------------------------------------------------------------------------------------------------"
+        echo "+--------------------------------------------------------------------------------------------------------------------------------------------------------------+"
         
       
 }
@@ -177,6 +219,15 @@ recover_key() {
 	    "$wallet_name" --recover
 
 }
+
+if [[ -z $ADDRESS ]] && [[ -z $KEYNAME ]]; then
+	echo -ne "Wallet Address: "
+	read address
+	echo -ne "Key Name: "
+	read keyname
+	sed -i 's/ADDRESS=\"\"/ADDRESS=\"'"$address"'\"/g' $0
+ 	sed -i 's/KEYNAME=\"\"/KEYNAME=\"'"$keyname"'\"/g' $0
+fi
 
 while [ "$#" -gt 0 ]; do
         key=${1}
