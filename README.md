@@ -65,25 +65,14 @@ $
 ```
 
 Example output:
-```
-$ ./mysentinel.sh subs
-+------+---------------------------------------------+------+-------------------------------+-------+-------------------------------------------------+------------+--------------+-------+---------------+
-|  ID  |                    OWNER                    | PLAN |            EXPIRY             | DENOM |                      NODE                       |   PRICE    |   DEPOSIT    | FREE  |    STATUS     |
-+------+---------------------------------------------+------+-------------------------------+-------+-------------------------------------------------+------------+--------------+-------+---------------+
-| 1329 | sent1c94r396teq8w3qgn548gp46zsjm2kjqn069z97 |    0 | 0001-01-01 00:00:00 +0000 UTC |       | sentnode1cwrk3xev08e75afd75y8ckqvt4ks4wq7g770v8 | 30000udvpn | 1000000udvpn | 0.00B | STATUS_ACTIVE |
-| 1488 | sent1c94r396teq8w3qgn548gp46zsjm2kjqn069z97 |    0 | 0001-01-01 00:00:00 +0000 UTC |       | sentnode1gm8zm3rnkklr6zp20qazpqayqcwg7g2gfnwyxy | 30000udvpn | 1000000udvpn | 0.00B | STATUS_ACTIVE |
-+------+---------------------------------------------+------+-------------------------------+-------+-------------------------------------------------+------------+--------------+-------+---------------+
- 
--------------------------------------------------------------------------------------------------------------
-|        Node Name           |          Location         |                   Node Address                   |
--------------------------------------------------------------------------------------------------------------
-|   Bouts-Node-Paris         |       France              | sentnode1gm8zm3rnkklr6zp20qazpqayqcwg7g2gfnwyxy  |
-|   Lomsy                    |       Poland              | sentnode1cwrk3xev08e75afd75y8ckqvt4ks4wq7g770v8  |
--------------------------------------------------------------------------------------------------------------
-$ 
+
+```shell
+mysentinel.sh subs
 ```
 
-In case I want to connect to **Lomsy** I would run:
+![mysentinel subscriptions](/home/bubonic/git3/freQniK/mysentinel/img/subs.png)
+
+In case I want to connect to a node I would run:
 
 ```
 $ ./mysentinel.sh conn 1329 sentnode1cwrk3xev08e75afd75y8ckqvt4ks4wq7g770v8
