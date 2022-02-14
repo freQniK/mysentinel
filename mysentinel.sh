@@ -84,7 +84,7 @@ list_sentinel_subscriptions() {
             --status Active \
             --limit 100 \
             --address $ADDRESS`
-        echo "$SUBOUTPUT" | sed -e 's/'"$SCRT"'/uscrt'"$IBCSPACES"'/g'
+        echo "$SUBOUTPUT" | sed -e 's/ibs\/'"$SCRT"'/uscrt'"$IBCSPACES"'/g'
         
         echo " "
         echo "                                                      Available Nodes                                                       "
