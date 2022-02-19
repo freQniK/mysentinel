@@ -56,11 +56,11 @@ subscribe_to_node() {
 	if [[ $is_scrt -eq 0 ]]; then
 		scrt_amt=`echo ${deposit} | sed 's/[^0-9]*//g'`
 		DEPOSIT=$scrt_amt"ibc/"$SCRT
-		echo "Total SCRT: ${DEPOSIT}"
+		echo "Total SCRT: ${DEPOSIT,,}"
 	
 	fi
 	
-	echo "NODE: $NODE, DEPOSIT: $DEPOSIT"
+	echo "NODE: $NODE, DEPOSIT: ${DEPOSIT,,}"
 	echo -ne "Confrim (y/n): "
 	read confirmation
 	if [[ "${confirmation^^}" == "Y" ]]; then	
@@ -70,7 +70,7 @@ subscribe_to_node() {
 		    --gas-prices 0.1udvpn \
 		    --chain-id sentinelhub-2 \
 		    --node https://rpc.sentinel.co:443 \
-		    --from "$KEYNAME" $NODE $DEPOSIT
+		    --from "$KEYNAME" $NODE ${DEPOSIT,,}
     	else
     		echo "Aww shucks. Alright then."
 	fi
