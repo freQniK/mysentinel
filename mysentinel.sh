@@ -4,7 +4,6 @@
 ADDRESS=""
 KEYNAME=""
 
-
 # DO NOT TOUCH 
 SCRT="31FEE1A2A9F9C01113F90BD0BBCCE8FD6BBB8585FAF109A2101827DD1D5B95B8"
 IBCSPACES="                                                               "
@@ -84,7 +83,7 @@ list_sentinel_subscriptions() {
             --status Active \
             --limit 100 \
             --address $ADDRESS`
-        echo "$SUBOUTPUT" | sed -e 's/ibs\/'"$SCRT"'/uscrt'"$IBCSPACES"'/g'
+        echo "$SUBOUTPUT" | sed -e 's/ibc\/'"$SCRT"'/uscrt'"$IBCSPACES"'/g'
         
         echo " "
         echo "                                                      Available Nodes                                                       "
