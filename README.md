@@ -70,7 +70,7 @@ Example output:
 mysentinel.sh subs
 ```
 
-![mysentinel subscriptions](/home/bubonic/git3/freQniK/mysentinel/img/subs.png)
+![mysentinel subscriptions](./img/subs.png)
 
 In case I want to connect to a node I would run:
 
